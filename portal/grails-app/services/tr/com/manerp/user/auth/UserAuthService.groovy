@@ -94,7 +94,7 @@ class UserAuthService {
         allMenuItemList.reverse().each { menuItem ->
 
             if (menuItem.type.equals(MenuItemType.CONTAINER)) {
-
+ls
                 boolean deleteMenuItem = true
 
                 menuItem.childs.find { child ->
