@@ -51,7 +51,6 @@ RUN set -v \
     && chown -R www:www /var/lib/nginx \
     && chown -R www:www /www
 
-RUN apk add python
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY launch/production/portal.conf /etc/nginx/nginx.conf
