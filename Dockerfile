@@ -66,4 +66,4 @@ RUN chmod +x ./*
 EXPOSE 80
 
 # Run the jar file
-ENTRYPOINT ["/usr/app/entrypoint.sh", "replace"]
+ENTRYPOINT ["/usr/app/entrypoint.sh"]
