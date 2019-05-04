@@ -10,7 +10,7 @@
   "dependencies": {
     "core-js": "^2.6.5",
     "vue": "^2.6.10",
-    "manerp-vue-base": "0.0.16",
+    "manerp-vue-base": "0.0.18",
     "vue-router": "^3.0.2"
   },
   "devDependencies": {
