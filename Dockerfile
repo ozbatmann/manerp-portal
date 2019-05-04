@@ -46,6 +46,18 @@ WORKDIR /usr/app
 # Add a volume pointing to /tmp
 VOLUME /tmp
 
+RUN set -v \
+    && apk update \
+    && apk add nginx \
+    && adduser -D -g 'www' www \
+    && mkdir /www \
+    && chown -R www:www /var/lib/nginx \
+    && chown -R www:www /www
+
+RUN apk add python
+
+VOLUME /etc/nginx/
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf && mkdir -p /run/nginx
 # The application's jar file
 COPY --from=jarBuilder /tmp/portal/build/libs/portal.jar .
 COPY --from=clientBuilder  /tmp/client/dist/ /www/
@@ -54,4 +66,3 @@ EXPOSE 80
 
 # Run the jar file
 ENTRYPOINT ["/usr/app/entrypoint.sh"]
-ssh
