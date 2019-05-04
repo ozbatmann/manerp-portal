@@ -10,6 +10,15 @@ grails.gorm.default.constraints = {
     '*'(nullable: true)
 }
 
+manerp {
+    rest{
+        manerpPortal{
+            url = 'http://localhost:8091'
+        }
+    }
+}
+
+
 environments {
     development {
         server {
