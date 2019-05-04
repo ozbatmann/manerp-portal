@@ -54,3 +54,4 @@ EXPOSE 80
 
 # Run the jar file
 ENTRYPOINT ["/usr/app/entrypoint.sh"]
+ssh
