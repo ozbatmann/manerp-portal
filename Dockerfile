@@ -36,7 +36,7 @@ RUN set -v \
     && chmod +x ./grailsw \
     && ./grailsw package
 
-
+cd
 
 ##### Application Image #######
 
