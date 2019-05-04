@@ -1,0 +1,133 @@
+---
+server:
+    contextPath: /
+    session:
+        cookie:
+            name: UISESSION
+plugin:
+    springsecurity:
+        controllerAnnotations:
+            chainMap:
+                '/api/**': 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter'
+                '/**': 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'
+        rest:
+            logout:
+                endpointUrl: '/api/logout'
+            login:
+                endpointUrl: 'api/login'
+            # ja é default
+            token:
+                validation:
+                    useBearerToken: false
+                    headerName: 'X-Auth-Token'
+grails:
+    profile: web
+    codegen:
+        defaultPackage: tr.com.manerp
+    gorm:
+        reactor:
+            # Whether to translate GORM events into Reactor events
+            # Disabled by default for performance reasons
+            events: false
+    controllers:
+        upload:
+            maxFileSize: 20000000
+            maxRequestSize: 20000000
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+spring:
+    main:
+        banner-mode: "off"
+    groovy:
+        template:
+            check-template-location: false
+
+# Spring Actuator Endpoints are Disabled by Default
+endpoints:
+    enabled: false
+    jmx:
+        enabled: true
+
+---
+grails:
+    mime:
+        disable:
+            accept:
+                header:
+                    userAgents:
+                        - Gecko
+                        - WebKit
+                        - Presto
+                        - Trident
+        types:
+            all: '*/*'
+            #            form: application/x-www-form-urlencoded
+            #            html:
+            #                - text/html
+            #                - application/xhtml+xml
+            #            js: text/javascript
+            json:
+                - application/json
+                - text/json
+            multipartForm: multipart/form-data
+    #            pdf: application/pdf
+    #            rss: application/rss+xml
+    #            text: text/plain
+    #            hal:
+    #                - application/hal+json
+    #                - application/hal+xml
+    #            xml:
+    #                - text/xml
+    #                - application/xml
+    urlmapping:
+        cache:
+            maxsize: 1000
+    controllers:
+        defaultScope: singleton
+    converters:
+        encoding: UTF-8
+    views:
+        default:
+            codec: html
+        gsp:
+            encoding: UTF-8
+            htmlcodec: xml
+            codecs:
+                expression: html
+                scriptlets: html
+                taglib: none
+                staticparts: none
+---
+grails:
+    cors:
+        enabled: true
+        exposedHeaders:
+            - X-Authorization
+            - X-EKX-UCID
+endpoints:
+    jmx:
+        unique-names: true
+    enabled: true
+---
+hibernate:
+    dialect: net.kaleidos.hibernate.PostgresqlExtensionsDialect
+    cache:
+        queries: false
+        use_second_level_cache: false
+        use_query_cache: false
+dataSource:
+    pooled: true
+    jmxExport: true
+    driverClassName: org.postgresql.Driver
+    username: manerp
+    password: manerp
+    #    password: manerp
+    properties:
+        validationQuery: "SELECT 1"
+        testOnBorrow: true
+        testWhileIdle: true
+        minEvictableIdleTimeMillis: 1000 * 60 * 5
+        timeBetweenEvictionRunsMillis: 1000 * 60 * 5

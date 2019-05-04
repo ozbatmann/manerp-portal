@@ -1,0 +1,27 @@
+{
+  "title": "Menü Elemanı",
+  "listHeader": "Menü Elemanı Listesi",
+  "tableHeaders": {
+    "label": {
+      "name": "Adı",
+      "description": "Tanım",
+      "type": "Tip",
+      "url": "Url",
+      "orderNo": "Sıra No",
+      "menu": "Menü",
+      "parentMenuItem": "Ana Menü Elemanı",
+      "securitySubjectPermission": "Yetki Nesnesi İzni"
+    }
+  },
+  "tooltips": {
+    "addNewMenuItem": "Yeni Menü Birimi Ekle"
+  },
+  "menuItemTypes": {
+    "menuItem": "Menu Elemanı",
+    "container": "Ana Menü"
+  },
+  "messages": {
+    "addMenuItem": "Menü Elemanı Ekle",
+    "updateMenuItem": "Menü Elemanı Güncelle"
+  }
+}

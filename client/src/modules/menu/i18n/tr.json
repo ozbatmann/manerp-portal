@@ -1,0 +1,17 @@
+{
+  "title": "Menü",
+  "listHeader": "Menü Listesi",
+  "tableHeaders": {
+    "label": {
+      "name": "Adı",
+      "app": "Uygulama"
+    }
+  },
+  "tooltips": {
+    "addNewMenu": "Yeni Menü Ekle"
+  },
+  "messages": {
+    "addMenu": "Menü Ekle",
+    "updateMenu": "Menü Güncelle"
+  }
+}
