@@ -4,7 +4,7 @@ FROM node:8-alpine as clientBuilder
 WORKDIR /tmp/
 USER root
 COPY [ "client*/package.json","client/yarn.*", "./client/" ]
-RUN npm config set registry http://registry.npm \
+RUN npm config set registry http://157.230.125.223:8081/repository/npm-group/ \
     && [ -d "client" ] \
     && (cd "client" \
     && yarn install --pure-lockfile --network-timeout 100000) ;
