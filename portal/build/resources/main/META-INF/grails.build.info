@@ -1,0 +1,6 @@
+#Sat, 04 May 2019 19:55:39 +0300
+
+info.app.version=0.1
+info.app.name=portal
+grails.env=development
+info.app.grailsVersion=3.3.8

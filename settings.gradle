@@ -1,2 +1,2 @@
-rootProject.name = 'Manerp-Portal'
-
+include 'portal'
+rootProject.name = 'Portal'

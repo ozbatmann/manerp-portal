@@ -29,7 +29,7 @@ RUN apk add --no-cache bash
 # Include project which contains client application
 # builded at the first stage
 COPY [ "gradle*", "settings.gradle", "VERSION", "./" ]
-COPY [ "grails-app", "./portal" ]
+COPY [ "portal", "./portal" ]
 RUN set -v \
     && cd portal \
     && echo "Grails build started" \
