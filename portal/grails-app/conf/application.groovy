@@ -39,12 +39,12 @@ environments {
         }
         dataSource {
             dbCreate = 'update'
-            url = System.getenv('POSTGRESQL_URL') ?: 'postgres'
+            url = System.getenv('POSTGRESQL_URL') ?: 'jdbc:postgresql://157.230.125.223:5432/manerp'
         }
         grails {
             redis {
                 database = System.getenv('REDIS_DB')?.toInteger() ?: 1
-                host = System.getenv('REDIS_HOST') ?: 'redis'
+                host = System.getenv('REDIS_HOST') ?: '157.230.125.223'
                 port = System.getenv('REDIS_PORT')?.toInteger() ?: 6379
                 timeout = System.getenv('REDIS_TIMEOUT')?.toInteger() ?: 15000
                 poolConfig {
