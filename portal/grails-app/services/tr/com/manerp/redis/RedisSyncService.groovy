@@ -110,7 +110,7 @@ class RedisSyncService {
             deleteValueListFromRedis(permissionKey, secSubPermIdListToDelete)
 
 
-            if (userAuthService.isMenuItemListChanged(appId, secSubPermIdListToDelete)) {
+            if (userAuthService.isMenuItemListChanged(secSubPermIdListToDelete)) {
 
                 reSynchronizeUserMenu(orgId,username, createRedisKey(orgId, username, RedisSyncType.MENU))
             }
@@ -255,7 +255,7 @@ class RedisSyncService {
                     if (allAffectedPermList.size() > 0) {
 
                         //MenuItem degisim kontrolu
-                        if (userAuthService.isMenuItemListChanged(appId, allAffectedPermList)) {
+                        if (userAuthService.isMenuItemListChanged(allAffectedPermList)) {
 
                             reSynchronizeUserMenu(orgId, username, createRedisKey(orgId, username, RedisSyncType.MENU))
                         }

@@ -275,7 +275,6 @@ ls
 
             role {
 
-                eq("app", _role.app)
                 isNotNull("rolePermission")
 
                 rolePermission {
@@ -326,17 +325,9 @@ ls
         Silinecek izinlerden kullanicinin gorecegi menuyu etkileyen izinler var mi diye kontrol edilecek.
      */
 
-    boolean isMenuItemListChanged(String appId, List<String> secSubPermIdList) {
+    boolean isMenuItemListChanged(List<String> secSubPermIdList) {
 
         List<MenuItem> menuItemList = MenuItem.createCriteria().list {
-
-            menu {
-
-                app {
-
-                    eq("id", appId)
-                }
-            }
 
             eq("type", MenuItemType.MENU_ITEM)
             isNotNull("securitySubjectPermission")

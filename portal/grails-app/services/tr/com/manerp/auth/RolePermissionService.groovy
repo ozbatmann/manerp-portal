@@ -6,6 +6,9 @@ import tr.com.manerp.base.service.BaseService
 @Transactional
 class RolePermissionService extends BaseService{
 
+    def redisSyncService
+
+
     RolePermission getRolePermission(String id){
         RolePermission rolePermission = RolePermission.get(id)
 
@@ -14,12 +17,23 @@ class RolePermissionService extends BaseService{
 
     def save(RolePermission rolePermission)
     {
-        rolePermission.save(flush: true, failOnError: true)
+        List<String> securitySubjectPermissionList = new ArrayList<>()
+        rolePermission.save(flush: true)
+        securitySubjectPermissionList.add(rolePermission.getSecuritySubjectPermission().getId().toString())
+
+        redisSyncService.updateRolePermFromRedis(rolePermission.getRole(), securitySubjectPermissionList, null)
     }
 
     def delete(RolePermission rolePermission)
     {
-        rolePermission.delete(flush: true, failOnError: true)
+        List<String> securitySubjectPermissionList = new ArrayList<>()
+        rolePermission.delete(flush: true)
+
+        securitySubjectPermissionList.add(rolePermission.getSecuritySubjectPermission().getId().toString())
+
+        securitySubjectPermissionList.add(rolePermission.getSecuritySubjectPermission().getId().toString())
+
+        redisSyncService.updateRolePermFromRedis(rolePermission.getRole(), null, securitySubjectPermissionList)
     }
 
 }
