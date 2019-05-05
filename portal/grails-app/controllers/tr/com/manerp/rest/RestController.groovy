@@ -141,10 +141,10 @@ class RestController extends BaseController{
         render maneResponse
     }
 
-    def deleteUser(String id) {
+    def deleteUser() {
 
         ManeResponse maneResponse = new ManeResponse()
-        User user = User.get(id)
+        User user = User.get(request.JSON.id)
 
         try {
 
@@ -216,8 +216,6 @@ class RestController extends BaseController{
 
     def updateRole(Role role)
     {
-        JSONArray jsonArray = new JSONArray()
-
         ManeResponse maneResponse = new ManeResponse()
 
         try {
@@ -252,10 +250,10 @@ class RestController extends BaseController{
         render maneResponse
     }
 
-    def deleteRole(String id)
+    def deleteRole()
     {
         ManeResponse maneResponse = new ManeResponse()
-        Role role = Role.get(id)
+        Role role = Role.get(request.JSON.id)
 
         try {
 
@@ -330,18 +328,17 @@ class RestController extends BaseController{
 
         render maneResponse
     }
-    def deleteRolePermission(String id)
+    def deleteRolePermission()
     {
-        JSONArray jsonArray = new JSONArray()
         ManeResponse maneResponse = new ManeResponse()
-        RolePermission rolePermission = RolePermission.get(id)
+        RolePermission rolePermission = RolePermission.get(request.JSON.id)
 
         try {
 
             rolePermissionService.delete(rolePermission)
             maneResponse.statusCode = StatusCode.NO_CONTENT
             maneResponse.message = 'Rol izni başarıyla silindi.'
-            jsonArray.add(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
 
         } catch (Exception ex) {
 
