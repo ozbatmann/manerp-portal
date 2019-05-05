@@ -6,8 +6,8 @@ import {bus, http, i18n, store} from "manerp-vue-base"
 import router from '@/router'
 import './pagination-models'
 
-//http.defaults.baseURL = "http://157.230.125.223:80";
-http.defaults.baseURL = "http://localhost:8091";
+http.defaults.baseURL = "http://157.230.125.223:80";
+//http.defaults.baseURL = "http://localhost:8091";
 
 window.instance = new Vue({
   router,
