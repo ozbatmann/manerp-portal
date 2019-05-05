@@ -151,7 +151,7 @@ class RestController extends BaseController{
             userService.delete(user)
             maneResponse.statusCode = StatusCode.NO_CONTENT
             maneResponse.message = 'Kullanıcı başarıyla silindi.'
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, maneResponse.message))
+            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
         } catch (Exception ex) {
 
             if (!user) {
