@@ -65,7 +65,7 @@ dependencies {
     // manerp response plugin
     compile "tr.com.manerp:manerp-response-plugin:0.3.6"
     // manerp auth plugin
-    compile "tr.com.manerp:manerp-auth-plugin:0.5.9"
+    compile "tr.com.manerp:manerp-auth-plugin:0.6.9"
 
     compile "org.grails:grails-datastore-rest-client"
 

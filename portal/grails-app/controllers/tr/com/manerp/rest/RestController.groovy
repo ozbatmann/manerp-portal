@@ -31,7 +31,7 @@ class RestController extends BaseController{
         ManeResponse maneResponse = new ManeResponse()
         try {
             JSONArray result = restService.getAllUserList(
-                    request.JSON.organizationId.toString())
+                    request.JSON.organizationId.toString(),request.JSON.roleId.toString())
 
             maneResponse.setData(result)
         }
@@ -285,7 +285,7 @@ class RestController extends BaseController{
 
         ManeResponse maneResponse = new ManeResponse()
         try {
-            JSONArray result = restService.getAllRolePermissionList()
+            JSONArray result = restService.getAllRolePermissionList(request.JSON.roleId.toString())
 
             maneResponse.setData(result)
         }
@@ -354,5 +354,21 @@ class RestController extends BaseController{
         }
 
         render maneResponse
+    }
+    def getAllSecuritySubjectPermissionList() {
+
+        ManeResponse maneResponse = new ManeResponse()
+        try {
+            JSONArray result = restService.getAllSecuritySubjectPermissionList()
+
+            maneResponse.setData(result)
+        }
+
+        catch (Exception e) {
+
+            throw new Exception(e.getMessage())
+        }
+        render maneResponse
+
     }
 }
