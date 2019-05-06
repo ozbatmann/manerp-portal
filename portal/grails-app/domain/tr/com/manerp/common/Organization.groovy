@@ -28,4 +28,3 @@ class Organization implements BaseDomain {
         userOrganization cascade: 'all-delete-orphan'
     }
 }
-

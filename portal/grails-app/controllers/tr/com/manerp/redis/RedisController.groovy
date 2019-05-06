@@ -8,7 +8,7 @@ import tr.com.manerp.enumeration.RedisSyncType
 class RedisController extends BaseController {
 
     static namespace = "v1"
-   RedisSyncService redisSyncService
+    RedisSyncService redisSyncService
 
     def index() { }
 

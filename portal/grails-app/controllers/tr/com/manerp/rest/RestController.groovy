@@ -2,6 +2,8 @@ package tr.com.manerp.rest
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import grails.converters.JSON
+import manerp.response.plugin.pagination.ManePaginatedResult
+import manerp.response.plugin.pagination.ManePaginationProperties
 import manerp.response.plugin.response.ManeResponse
 import manerp.response.plugin.response.StatusCode
 import org.grails.web.json.JSONArray
@@ -9,9 +11,13 @@ import org.grails.web.json.JSONObject
 import tr.com.manerp.auth.Role
 import tr.com.manerp.auth.RolePermission
 import tr.com.manerp.auth.SaltGenerator
+import tr.com.manerp.auth.SecuritySubjectPermission
 import tr.com.manerp.base.controller.BaseController
+import tr.com.manerp.common.Organization
+import tr.com.manerp.dto.RolePermissionDto
 import tr.com.manerp.user.Person
 import tr.com.manerp.user.User
+import tr.com.manerp.user.UserOrganizationRole
 
 import javax.xml.bind.ValidationException
 import java.nio.charset.StandardCharsets
@@ -25,6 +31,7 @@ class RestController extends BaseController{
     def personService
     def roleService
     def rolePermissionService
+    def userOrganizationRoleService
 
     def getAllUserList(){
 
@@ -33,7 +40,13 @@ class RestController extends BaseController{
             JSONArray result = restService.getAllUserList(
                     request.JSON.organizationId.toString(),request.JSON.roleId.toString())
 
-            maneResponse.setData(result)
+            if(result.size() > 0){
+                maneResponse.setData(result)
+            }
+            else{
+                result.add(new JSONObject(message: "Kullanıcı bulunamadı."))
+                maneResponse.setData(result)
+            }
         }
 
         catch (Exception e) {
@@ -185,13 +198,19 @@ class RestController extends BaseController{
         render maneResponse
     }
 
-    def addRole(Role role)
+    def addRole()
     {
         ManeResponse maneResponse = new ManeResponse()
 
         try {
+            Role role = new Role()
+            role.name = request.JSON.name
             role.active = true
             roleService.save(role)
+            UserOrganizationRole userOrganizationRole = new UserOrganizationRole()
+            userOrganizationRole.organization = Organization.findById(request.JSON.organizationId)
+            userOrganizationRole.role = role
+            userOrganizationRoleService.save(userOrganizationRole)
             maneResponse.statusCode = StatusCode.CREATED
             maneResponse.setData(new JSONObject(id: role.id, name: role.name))
             maneResponse.message = 'Rol başarıyla kaydedildi.'
@@ -284,7 +303,7 @@ class RestController extends BaseController{
     def getAllRolePermissionList() {
 
         ManeResponse maneResponse = new ManeResponse()
-        try {
+       /* try {
             JSONArray result = restService.getAllRolePermissionList(request.JSON.roleId.toString())
 
             maneResponse.setData(result)
@@ -295,16 +314,49 @@ class RestController extends BaseController{
             throw new Exception(e.getMessage())
         }
         render maneResponse
+*/
 
+        List result = restService.getAllRolePermissionList()
+        List secSubPermList = new ArrayList()
+
+        Role role = Role.findById(request.JSON.roleId)
+
+        List availablePermissionTypes = new ArrayList()
+        List unavailablePermissionTypes = new ArrayList()
+
+        def resultList = new ArrayList()
+
+        result.each { secSub ->
+            RolePermissionDto rpDto = new RolePermissionDto()
+            unavailablePermissionTypes = restService.getAllUnavailablePermissionTypes(role.id,secSub.id.toString())
+
+            secSubPermList.add(unavailablePermissionTypes)
+            availablePermissionTypes = restService.getAllAvailablePermissionTypes(role.id,secSub.id.toString())
+            rpDto.setName(secSub.name)
+            rpDto.setAvailablePermissions(availablePermissionTypes)
+            rpDto.setUnavailablePermissions(unavailablePermissionTypes)
+            resultList.add(rpDto)
+        }
+
+        JSONArray jsonArray = (JSONArray) resultList
+
+        maneResponse.setData(jsonArray)
+
+        render maneResponse
     }
 
 
-    def addRolePermission(RolePermission rolePermission)
+    def addRolePermission()
     {
 
         ManeResponse maneResponse = new ManeResponse()
 
         try {
+            RolePermission rolePermission = new RolePermission()
+            Role role = Role.findById(request.JSON.roleId)
+            SecuritySubjectPermission securitySubjectPermission = SecuritySubjectPermission.findById(request.JSON.id)
+            rolePermission.securitySubjectPermission = securitySubjectPermission
+            rolePermission.role = role
             rolePermission.active = true
             rolePermissionService.save(rolePermission)
             maneResponse.statusCode = StatusCode.CREATED
@@ -331,7 +383,9 @@ class RestController extends BaseController{
     def deleteRolePermission()
     {
         ManeResponse maneResponse = new ManeResponse()
-        RolePermission rolePermission = RolePermission.get(request.JSON.id)
+        SecuritySubjectPermission securitySubjectPermission = SecuritySubjectPermission.findById(request.JSON.id)
+
+        RolePermission rolePermission = RolePermission.findBySecuritySubjectPermission(securitySubjectPermission)
 
         try {
 
@@ -345,6 +399,7 @@ class RestController extends BaseController{
             if ( !rolePermission ) {
                 maneResponse.statusCode = StatusCode.BAD_REQUEST
                 maneResponse.message = 'Silinmek istenen rol izni sistemde bulunmamaktadır.'
+                maneResponse.setData(true)
             }
 
             if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR

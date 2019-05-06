@@ -21,7 +21,6 @@ dependencies:
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/org.grails.plugins/views-json-templates/1.2.8/c3306037a100238dbbe89b02932c746d7fdedef/views-json-templates-1.2.8.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/org.grails.plugins/postgresql-extensions/6.1.0/eb8864bfdfb110a762bc151902ecba88180c04aa/postgresql-extensions-6.1.0.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/tr.com.manerp/manerp-response-plugin/0.3.6/9c01c0c971acb042e835f9703b6a8c9610191bfb/manerp-response-plugin-0.3.6.jar
-- file:/Users/aliimranozbatman/.m2/repository/tr/com/manerp/manerp-auth-plugin/0.5.9/manerp-auth-plugin-0.5.9.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/org.grails/grails-datastore-rest-client/6.1.10.RELEASE/7854404e6dcc3b03fb24ea9c37fb419f1e568eb5/grails-datastore-rest-client-6.1.10.RELEASE.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/org.grails.plugins/redis/2.0.5/b6e08ff97c0f3302a5f3b8ebd46c97a2a19db5a9/redis-2.0.5.jar
 - file:/Users/aliimranozbatman/.m2/repository/at/favre/lib/bcrypt/0.7.0/bcrypt-0.7.0.jar
@@ -77,7 +76,6 @@ dependencies:
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/org.grails/views-core/1.2.8/c15fb1242efd3c977801f92c9079c62b71de0223/views-core-1.2.8.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.5/f645ed69d595b24d4cf8b3fbb64cc505bede8829/gson-2.8.5.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/org.hibernate/hibernate-ehcache/5.0.12.Final/94cb5e56441d2bf6cb527c0f6b4d3c3cf185d333/hibernate-ehcache-5.0.12.Final.jar
-- file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/com.bertramlabs.plugins/asset-pipeline-grails/2.14.2/78d9651f5fc3dee1fce57cd5b01a18f9e53486b0/asset-pipeline-grails-2.14.2.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.10/4b95f4897fa13f2cd904aee711aeafc0c5295cd8/commons-codec-1.10.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/redis.clients/jedis/2.9.0/292bc9cc26553acd3cccc26f2f95620bf88a04c2/jedis-2.9.0.jar
 - file:/Users/aliimranozbatman/.m2/repository/at/favre/lib/bytes/0.8.0/bytes-0.8.0.jar
@@ -117,7 +115,6 @@ dependencies:
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/javax.el/javax.el-api/2.2.4/1287562cc3f0ff5439ded6f2949e73ce1c0edaab/javax.el-api-2.2.4.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/xml-apis/xml-apis/1.4.01/3789d9fada2d3d458c4ba2de349d48780f381ee3/xml-apis-1.4.01.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/net.sf.ehcache/ehcache-core/2.4.3/fd258ef6959f27fb678b04f90139ded4588e2d15/ehcache-core-2.4.3.jar
-- file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/com.bertramlabs.plugins/asset-pipeline-core/2.14.2/91e427fa721bb38ff18b8b1752b1081f8e90fc76/asset-pipeline-core-2.14.2.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-pool2/2.4.3/e7ab2a5143cb4e0b21d8ca81c265095e4567dd22/commons-pool2-2.4.3.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-annotations/2.8.0/45b426f7796b741035581a176744d91090e2e6fb/jackson-annotations-2.8.0.jar
 - file:/Users/aliimranozbatman/.gradle/caches/modules-2/files-2.1/com.fasterxml.jackson.core/jackson-core/2.8.11/876ead1db19f0c9e79c9789273a3ef8c6fd6c29b/jackson-core-2.8.11.jar

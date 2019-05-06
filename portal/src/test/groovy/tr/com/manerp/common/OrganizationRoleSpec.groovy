@@ -2,7 +2,6 @@ package tr.com.manerp.common
 
 import grails.testing.gorm.DomainUnitTest
 import spock.lang.Specification
-import tr.com.manerp.user.UserOrganizationRole
 
 class OrganizationRoleSpec extends Specification implements DomainUnitTest<UserOrganizationRole> {
 

@@ -51,7 +51,7 @@ class UserAuthService {
         } as List<SecuritySubjectPermission>
 
 
-      return userOrgPermissionList
+        return userOrgPermissionList
     }
 
 
@@ -94,7 +94,7 @@ class UserAuthService {
         allMenuItemList.reverse().each { menuItem ->
 
             if (menuItem.type.equals(MenuItemType.CONTAINER)) {
-ls
+                ls
                 boolean deleteMenuItem = true
 
                 menuItem.childs.find { child ->

@@ -1,3 +1,4 @@
+
 package tr.com.manerp.user
 
 import tr.com.manerp.auth.Role
@@ -11,7 +12,7 @@ class UserOrganizationRole implements BaseDomain {
     Role role
 
     static constraints = {
-        user nullable: false
+        user nullable: true
         organization nullable: false
         role nullable: false
     }

@@ -61,35 +61,35 @@ class RedisSyncService {
                 String field
                 def value
 
-                    field = redisData.id
+                field = redisData.id
 
-                    if (redisData instanceof SecuritySubjectPermission) {
+                if (redisData instanceof SecuritySubjectPermission) {
 
-                        value = new JSONObject(permission: redisData.securitySubject.name + ":" + redisData.permissionType.name)
-                    } else if (redisData instanceof MenuItem) {
+                    value = new JSONObject(permission: redisData.securitySubject.name + ":" + redisData.permissionType.name)
+                } else if (redisData instanceof MenuItem) {
 
-                        value = new JSONObject(id: redisData.id,
-                                name: redisData.name,
-                                orderNo: redisData.orderNo,
-                                url: redisData.url,
-                                type: redisData.type.toString(),
-                                icon: redisData.icon == null ? null : Base64.encodeAsBase64(redisData.icon),
-                                permission: redisData.securitySubjectPermission == null ? null : redisData.securitySubjectPermission.securitySubject.name + ":" + redisData.securitySubjectPermission.permissionType.name,
-                                parent: redisData.parent == null ? null : redisData.parent.id)
-                    } else {
+                    value = new JSONObject(id: redisData.id,
+                            name: redisData.name,
+                            orderNo: redisData.orderNo,
+                            url: redisData.url,
+                            type: redisData.type.toString(),
+                            icon: redisData.icon == null ? null : Base64.encodeAsBase64(redisData.icon),
+                            permission: redisData.securitySubjectPermission == null ? null : redisData.securitySubjectPermission.securitySubject.name + ":" + redisData.securitySubjectPermission.permissionType.name,
+                            parent: redisData.parent == null ? null : redisData.parent.id)
+                } else {
 
 
-                        value = new JSONObject(id: redisData.id, name: redisData.name,
-                                logo: redisData.logo == null ? null : Base64.encodeAsBase64(redisData.logo))
-                    }
-
-                    resultArr.add(value instanceof JSONObject ? value : new JSONObject(userOrg: value.toString()))
-
-                    jedis.hset(key, field, value.toString())
-                    log.info("writeToRedis   :    key= " + key + " value=" + value.toString())
+                    value = new JSONObject(id: redisData.id, name: redisData.name,
+                            logo: redisData.logo == null ? null : Base64.encodeAsBase64(redisData.logo))
                 }
 
+                resultArr.add(value instanceof JSONObject ? value : new JSONObject(userOrg: value.toString()))
+
+                jedis.hset(key, field, value.toString())
+                log.info("writeToRedis   :    key= " + key + " value=" + value.toString())
             }
+
+        }
 
         resultArr
     }

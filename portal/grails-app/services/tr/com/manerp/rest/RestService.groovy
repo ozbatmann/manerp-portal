@@ -1,17 +1,13 @@
 package tr.com.manerp.rest
 
-import grails.converters.JSON
+
 import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
-import tr.com.manerp.auth.PermissionType
-import tr.com.manerp.auth.Role
 import tr.com.manerp.auth.RolePermission
 import tr.com.manerp.auth.SecuritySubject
 import tr.com.manerp.auth.SecuritySubjectPermission
 import tr.com.manerp.base.service.BaseService
-import tr.com.manerp.user.User
-import tr.com.manerp.user.UserOrganization
 import tr.com.manerp.user.UserOrganizationRole
 
 @Transactional
@@ -20,9 +16,9 @@ class RestService extends BaseService{
 
     JSONArray getAllUserList(String organizationId,String roleId){
 
-        JSONArray jsonArray = new JSONArray()
+        JSONArray jsonArray = new JSONArray(new JSONObject())
 
-        UserOrganizationRole.createCriteria().list{
+       List<UserOrganizationRole> userOrganizationRoleList = UserOrganizationRole.createCriteria().list{
             organization{
                 eq("id",organizationId)
             }
@@ -32,8 +28,13 @@ class RestService extends BaseService{
             projections{
                 property("user")
             }
-        }.collect{it -> jsonArray.add(new JSONObject(id: it.id, username: it.username, name: it.person.name, surname: it.person.surname, birthDate: it.person.birthDate, email: it.person.email))}
+        } as List
 
+        if(userOrganizationRoleList.get(0) != null){
+          userOrganizationRoleList.collect{
+              jsonArray.add(new JSONObject(id: it.id, username: it.username, name: it.person.name, surname: it.person.surname, birthDate: it.person.birthDate, email: it.person.email))}
+
+        }
         return jsonArray
     }
 
@@ -46,18 +47,15 @@ class RestService extends BaseService{
             organization{
                 eq("id",organizationId)
             }
-            projections{
-                property("role")
-            }
-        }.collect{it -> jsonArray.add(new JSONObject(id: it.id, name: it.name))}
+        }.collect{it -> jsonArray.add(new JSONObject(id: it.id, organization: [id: it.organization.id, name: it.organization.name], role:[id: it.role.id, name: it.role.name]))}
 
         return jsonArray
     }
 
 
-    JSONArray getAllRolePermissionList(String roleId) {
+    List getAllRolePermissionList() {
 
-        List<SecuritySubject> securitySubjectList = SecuritySubject.list()
+      /*  List<SecuritySubject> securitySubjectList = SecuritySubject.list()
 
         JSONArray jsonArray = new JSONArray()
 
@@ -92,12 +90,99 @@ class RestService extends BaseService{
 
             } as List
 
+*/
+           List securitySubjectPermissionList = SecuritySubjectPermission.createCriteria().list{
 
+                projections {
+                    distinct("securitySubject")
+                }
 
-
-
-        return jsonArray
+            } as List
+            return securitySubjectPermissionList
     }
+    List getAllUnavailablePermissionTypes(def roleId, def securitySubjectId){
+        List<String> secSubPermList = new ArrayList<>()
+
+        secSubPermList = RolePermission.createCriteria().list {
+
+            role{
+                eq("id",roleId)
+            }
+            securitySubjectPermission{
+                projections{
+                    property("id")
+                }
+            }
+
+        } as List<String>
+
+        if(secSubPermList.size() > 0){
+        List unavailablePermTypeList = SecuritySubjectPermission.createCriteria().list{
+            securitySubject{
+                eq("id",securitySubjectId)
+            }
+
+                'in'("id", secSubPermList)
+            projections{
+
+                property("id")
+
+                permissionType{
+
+                    property("id")
+                    property("name")
+                }
+            }
+
+        } as List
+            return unavailablePermTypeList
+        }
+        return secSubPermList
+    }
+
+
+    List getAllAvailablePermissionTypes(def roleId,def securitySubjectId){
+
+        List<String> secSubPermList = new ArrayList<>()
+        secSubPermList = RolePermission.createCriteria().list {
+
+            role{
+                eq("id",roleId)
+            }
+            securitySubjectPermission{
+                projections{
+                    property("id")
+                }
+            }
+        } as List
+
+        if(secSubPermList.size() > 0){
+        List availablePermTypeList = SecuritySubjectPermission.createCriteria().list{
+            securitySubject{
+                eq("id",securitySubjectId)
+            }
+
+                not {
+                    'in'("id", secSubPermList)
+                }
+            projections{
+
+                property("id")
+
+                permissionType{
+
+                    property("id")
+                    property("name")
+                }
+            }
+
+        } as List
+            return availablePermTypeList
+        }
+        return secSubPermList
+
+    }
+
     JSONArray getAllSecuritySubjectPermissionList() {
 
         List<SecuritySubject> securitySubjectList = SecuritySubject.list()

@@ -4,7 +4,6 @@ import grails.gorm.transactions.Transactional
 import manerp.response.plugin.pagination.ManePaginatedResult
 import manerp.response.plugin.pagination.ManePaginationProperties
 import tr.com.manerp.base.service.BaseService
-import tr.com.manerp.user.UserOrganizationRole
 
 @Transactional
 class OrganizationService extends BaseService{
