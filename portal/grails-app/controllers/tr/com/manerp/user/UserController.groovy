@@ -14,7 +14,8 @@ import javax.xml.bind.ValidationException
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 
-class UserController extends BaseController {
+class UserController extends BaseController
+{
 
     static namespace = "v1"
     static allowedMethods = [index: "GET", show: "GET", save: "POST", update: "PUT", delete: "DELETE"]
@@ -25,7 +26,8 @@ class UserController extends BaseController {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd")
 
 
-    def index() {
+    def index()
+    {
         ManeResponse maneResponse = new ManeResponse()
 
         try {
@@ -41,7 +43,7 @@ class UserController extends BaseController {
 
         } catch (Exception ex) {
 
-            if (maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
+            if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
             maneResponse.message = ex.getMessage()
             ex.printStackTrace()
         }
@@ -49,7 +51,8 @@ class UserController extends BaseController {
         render maneResponse
     }
 
-    def save() {
+    def save()
+    {
         def requestParams = request.JSON
 
         ManeResponse maneResponse = new ManeResponse()
@@ -66,6 +69,7 @@ class UserController extends BaseController {
             personService.save(person)
 
             User user = new User()
+            user.staffId = requestParams.staffId
             user.username = requestParams.username
             byte[] salt = SaltGenerator.generateSalt()
             byte[] password = BCrypt.withDefaults().hash(6, salt, requestParams.password.getBytes(StandardCharsets.UTF_8))
@@ -96,7 +100,8 @@ class UserController extends BaseController {
 
     }
 
-    def update() {
+    def update()
+    {
         def requestParams = request.JSON
 
         ManeResponse maneResponse = new ManeResponse()
@@ -113,7 +118,7 @@ class UserController extends BaseController {
 
             User user = User.get(requestParams.id)
             user.username = requestParams.username
-            if (!user.password == requestParams.password) {
+            if ( !user.password == requestParams.password ) {
                 byte[] salt = SaltGenerator.generateSalt()
                 byte[] password = BCrypt.withDefaults().hash(6, salt, requestParams.password.getBytes(StandardCharsets.UTF_8))
                 user.password = password
@@ -142,7 +147,8 @@ class UserController extends BaseController {
         render maneResponse
     }
 
-    def delete(String id) {
+    def delete(String id)
+    {
         ManeResponse maneResponse = new ManeResponse()
         User user = User.get(id)
 
@@ -154,12 +160,12 @@ class UserController extends BaseController {
 
         } catch (Exception ex) {
 
-            if (!user) {
+            if ( !user ) {
                 maneResponse.statusCode = StatusCode.BAD_REQUEST
                 maneResponse.message = 'Silinmek istenen kullanıcı sistemde bulunmamaktadır.'
             }
 
-            if (maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
+            if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
             maneResponse.message = maneResponse.message ?: ex.getMessage()
             ex.printStackTrace()
         }
@@ -167,7 +173,8 @@ class UserController extends BaseController {
         render maneResponse
     }
 
-    def userOrganizationList() {
+    def userOrganizationList()
+    {
 
         ManeResponse maneResponse = new ManeResponse()
 
@@ -175,7 +182,7 @@ class UserController extends BaseController {
 
             PaginationCommand cmd = new PaginationCommand(params)
 
-            ManePaginatedResult result = userService.getUserOrganizationList(new ManePaginationProperties(cmd.limit, cmd.offset, cmd.sort, cmd.fields),params.id)
+            ManePaginatedResult result = userService.getUserOrganizationList(new ManePaginationProperties(cmd.limit, cmd.offset, cmd.sort, cmd.fields), params.id)
             result.data = result.data.collect {
                 return [id: it.id, organization: [id: it.organization.id, name: it.organization.name, unitCode: it.organization.unitCode, description: it.organization.description]]
             }
@@ -183,7 +190,7 @@ class UserController extends BaseController {
 
         } catch (Exception ex) {
 
-            if (maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
+            if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
             maneResponse.message = ex.getMessage()
             ex.printStackTrace()
         }
@@ -191,7 +198,8 @@ class UserController extends BaseController {
         render maneResponse
     }
 
-    def userOrganizationRoleList() {
+    def userOrganizationRoleList()
+    {
 
         ManeResponse maneResponse = new ManeResponse()
 
@@ -199,29 +207,31 @@ class UserController extends BaseController {
 
             PaginationCommand cmd = new PaginationCommand(params)
 
-            ManePaginatedResult result = userService.getUserOrganizationRoleList(new ManePaginationProperties(cmd.limit, cmd.offset, cmd.sort, cmd.fields),params.id)
+            ManePaginatedResult result = userService.getUserOrganizationRoleList(new ManePaginationProperties(cmd.limit, cmd.offset, cmd.sort, cmd.fields), params.id)
             result.data = result.data.collect {
-                return [id  : it.id, user: [id: it.user.id, username: it.user.username],organization: [id: it.organization.id, name: it.organization.name],
+                return [id  : it.id, user: [id: it.user.id, username: it.user.username], organization: [id: it.organization.id, name: it.organization.name],
                         role: [id: it.role.id, name: it.role.name]]
             }
             maneResponse.data = result.toMap()
 
         } catch (Exception ex) {
 
-            if (maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
+            if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
             maneResponse.message = ex.getMessage()
             ex.printStackTrace()
         }
 
         render maneResponse
     }
-    def isValidUser() {
+
+    def isValidUser()
+    {
 
         ManeResponse maneResponse = new ManeResponse()
 
         try {
 
-            boolean validationResult =  userService.isValidUser(request.JSON.username.toString(), request.JSON.password.toString())
+            boolean validationResult = userService.isValidUser(request.JSON.username.toString(), request.JSON.password.toString())
             UserOrganization userOrganization = UserOrganization.findByUser(User.findByUsername(request.JSON.username))
             User user = userOrganization.user
             Organization organization = userOrganization.organization
@@ -229,7 +239,7 @@ class UserController extends BaseController {
         }
         catch (Exception ex) {
 
-            if (maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
+            if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
             maneResponse.message = ex.getMessage()
             ex.printStackTrace()
         }

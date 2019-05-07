@@ -4,10 +4,12 @@ import grails.databinding.BindingFormat
 import tr.com.manerp.base.domain.BaseDomain
 import tr.com.manerp.common.Organization
 
-class User implements BaseDomain {
+class User implements BaseDomain
+{
 
     String username
     byte[] password
+    String staffId
     boolean accountExpired = false
     boolean accountLocked = false
     boolean passwordExpired = false
@@ -27,13 +29,14 @@ class User implements BaseDomain {
     static constraints = {
 
         username blank: false, unique: true
-        person nullable:true,blank:false
+        person nullable: true, blank: false
         lastLogin nullable: true
         accExpiredDate nullable: true
         accLockedDate nullable: true
         passExpiredDate nullable: true
         password nullable: true
         salt nullable: true
+        staffId nullable: true
     }
 
     static mapping = {
