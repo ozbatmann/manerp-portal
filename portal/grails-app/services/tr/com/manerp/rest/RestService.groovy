@@ -8,6 +8,7 @@ import tr.com.manerp.auth.RolePermission
 import tr.com.manerp.auth.SecuritySubject
 import tr.com.manerp.auth.SecuritySubjectPermission
 import tr.com.manerp.base.service.BaseService
+import tr.com.manerp.dto.RolePermissionDto
 import tr.com.manerp.user.UserOrganizationRole
 
 @Transactional
@@ -100,7 +101,7 @@ class RestService extends BaseService{
             } as List
             return securitySubjectPermissionList
     }
-    List getAllUnavailablePermissionTypes(def roleId, def securitySubjectId){
+    def getAllUnavailablePermissionTypes(RolePermissionDto rpDto, def roleId, def securitySubjectId){
         List<String> secSubPermList = new ArrayList<>()
 
         secSubPermList = RolePermission.createCriteria().list {
@@ -117,31 +118,19 @@ class RestService extends BaseService{
         } as List<String>
 
         if(secSubPermList.size() > 0){
-        List unavailablePermTypeList = SecuritySubjectPermission.createCriteria().list{
+        SecuritySubjectPermission.createCriteria().list{
             securitySubject{
                 eq("id",securitySubjectId)
             }
 
                 'in'("id", secSubPermList)
-            projections{
 
-                property("id")
-
-                permissionType{
-
-                    property("id")
-                    property("name")
-                }
-            }
-
-        } as List
-            return unavailablePermTypeList
+        }.collect{it2 -> rpDto.permissions.add([id:it2.id, name: it2.permissionType.name,status: true])} as List
         }
-        return secSubPermList
     }
 
 
-    List getAllAvailablePermissionTypes(def roleId,def securitySubjectId){
+    def getAllAvailablePermissionTypes(RolePermissionDto rpDto,def roleId,def securitySubjectId){
 
         List<String> secSubPermList = new ArrayList<>()
         secSubPermList = RolePermission.createCriteria().list {
@@ -165,22 +154,10 @@ class RestService extends BaseService{
                 not {
                     'in'("id", secSubPermList)
                 }
-            projections{
 
-                property("id")
 
-                permissionType{
-
-                    property("id")
-                    property("name")
-                }
-            }
-
-        } as List
-            return availablePermTypeList
+        }.collect{it2 -> rpDto.permissions.add([id:it2.id, name: it2.permissionType.name,status: false])} as List
         }
-        return secSubPermList
-
     }
 
     JSONArray getAllSecuritySubjectPermissionList() {

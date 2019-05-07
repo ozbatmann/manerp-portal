@@ -41,6 +41,7 @@ class RestController extends BaseController{
                     request.JSON.organizationId.toString(),request.JSON.roleId.toString())
 
             if(result.size() > 0){
+                result.add(new JSONObject("totalCount":result.size()))
                 maneResponse.setData(result)
             }
             else{
@@ -187,7 +188,7 @@ class RestController extends BaseController{
         ManeResponse maneResponse = new ManeResponse()
         try {
             JSONArray result = restService.getAllRoleList(request.JSON.organizationId)
-
+            result.add(new JSONObject("totalCount":result.size()))
             maneResponse.setData(result)
         }
 
@@ -317,28 +318,24 @@ class RestController extends BaseController{
 */
 
         List result = restService.getAllRolePermissionList()
-        List secSubPermList = new ArrayList()
 
         Role role = Role.findById(request.JSON.roleId)
-
-        List availablePermissionTypes = new ArrayList()
-        List unavailablePermissionTypes = new ArrayList()
 
         def resultList = new ArrayList()
 
         result.each { secSub ->
             RolePermissionDto rpDto = new RolePermissionDto()
-            unavailablePermissionTypes = restService.getAllUnavailablePermissionTypes(role.id,secSub.id.toString())
+            restService.getAllUnavailablePermissionTypes(rpDto,role.id,secSub.id.toString())
 
-            secSubPermList.add(unavailablePermissionTypes)
-            availablePermissionTypes = restService.getAllAvailablePermissionTypes(role.id,secSub.id.toString())
+            restService.getAllAvailablePermissionTypes(rpDto,role.id,secSub.id.toString())
             rpDto.setName(secSub.name)
-            rpDto.setAvailablePermissions(availablePermissionTypes)
-            rpDto.setUnavailablePermissions(unavailablePermissionTypes)
             resultList.add(rpDto)
         }
 
+
+
         JSONArray jsonArray = (JSONArray) resultList
+        jsonArray.add(new JSONObject("totalCount":resultList.size()))
 
         maneResponse.setData(jsonArray)
 
