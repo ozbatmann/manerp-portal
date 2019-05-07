@@ -16,15 +16,24 @@
             <v-icon>refresh</v-icon>
         </v-btn>
 
-        <v-btn icon>
-            <v-icon>more_vert</v-icon>
+        <v-btn icon @click="logout">
+            <v-icon>mdi-logout-variant</v-icon>
         </v-btn>
     </v-toolbar>
 </template>
 
 <script>
     export default {
-        name: "AppToolbar"
+        name: "AppToolbar",
+        methods: {
+            logout () {
+                this.$store.state.shared['user'] = null
+                this.$store.state.shared['auth-token'] = null
+                this.$router.push( {path: "/auth/login"})
+
+            },
+
+        }
     }
 </script>
 

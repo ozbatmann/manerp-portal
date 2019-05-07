@@ -3,6 +3,7 @@
   <v-app>
 
     <app-toolbar></app-toolbar>
+
   <v-navigation-drawer
           mobile-break-point="700"
           fixed app class="elevation-1"
@@ -94,11 +95,11 @@
       </v-list>
     </v-layout>
   </v-navigation-drawer>
+    <v-content>
+    <v-fade-transition mode="out-in">
 
-    <v-content class="app-content">
-      <transition name="slide-x-transition" mode="out-in">
-        <router-view></router-view>
-      </transition>
+      <router-view></router-view>
+    </v-fade-transition>
     </v-content>
   </v-app>
 </template>

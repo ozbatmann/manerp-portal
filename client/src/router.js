@@ -1,9 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import {store} from 'manerp-vue-base'
 Vue.use(Router);
 
+import App from '@/App'
 import AppLayout from '@/modules/shared/components/AppLayout'
 /*import Home from '@/modules/core/pages/Home'*/
+import Login from '@/modules/auth/pages/MLogin'
 import User from '@/modules/user/pages/User'
 import Organization from '@/modules/organization/pages/Organization'
 import OrganizationRole from '@/modules/organization/pages/OrganizationRole'
@@ -33,8 +36,32 @@ const router = new Router({
     routes: [
         {
             path: '/',
-            component: AppLayout,
+            component: App,
+            redirect : "overview",
             children: [
+                {
+                    path: 'auth',
+                    redirect: { name: "Login" },
+                    component: () => import('@/modules/auth/pages/MCoreAuthentication'),
+                    children: [
+                        {
+                            path: 'login',
+                            name: "Login",
+                            // beforeEnter: authenticated(),
+                            component: () => import('@/modules/auth/pages/MLogin')
+                        },
+                        {
+                            path: 'reset/mail',
+                            name: "SendResetMail",
+                            component: () => import('@/modules/auth/pages/MResetPasswordSendMail')
+                        },
+                        {
+                            path: 'reset/password/:id',
+                            name: "ResetPassword",
+                            component: () => import('@/modules/auth/pages/MResetPassword')
+                        }
+                    ]
+                },
                /* {
                 path: '',
                 component: Home,
@@ -45,106 +72,131 @@ const router = new Router({
                 }
             },*/
                 {
-                    path: '/user',
-                    component: User,
-                    name: 'User',
+                    path: '/overview',
+                    component: AppLayout,
+                    name: 'Overview',
                     meta: {
-                        title: 'user.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/userOrganization/:id',
-                    component: UserOrganization,
-                    name: 'UserOrganization',
-                    meta: {
-                        title: 'user.organization.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/organization',
-                    component: Organization,
-                    name: 'Organization',
-                    meta: {
-                        title: 'organization.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/userOrganizationRole/:id',
-                    component: OrganizationRole,
-                    name: 'OrganizationRole',
-                    meta: {
-                        title: 'organization.role.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/menu',
-                    component: Menu,
-                    name: 'Menu',
-                    meta: {
-                        title: 'menu.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/menuItem',
-                    component: MenuItem,
-                    name: 'MenuItem',
-                    meta: {
-                        title: 'menuItem.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/role',
-                    component: Role,
-                    name: 'Role',
-                    meta: {
-                        title: 'role.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/rolePermission/:id',
-                    component: RolePermission,
-                    name: 'RolePermission',
-                    meta: {
-                        title: 'rolePermission.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/securitySubject',
-                    component: SecuritySubject,
-                    name: 'SecuritySubject',
-                    meta: {
-                        title: 'securitySubject.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/securitySubjectPermission/:id',
-                    component: SecuritySubjectPermission,
-                    name: 'SecuritySubjectPermission',
-                    meta: {
-                        title: 'securitySubjectPermission.title',
-                        noCache: true
-                    }
-                },
-                {
-                    path: '/permissionType',
-                    component: PermissionType,
-                    name: 'PermissionType',
-                    meta: {
-                        title: 'permissionType.title',
-                        noCache: true
-                    }
-                },
+                        title: 'overview.title',
+                        noCache: true,
+                        requiresAuth: true
+                    },
+                    children: [
+                        {
+                            path: '/user',
+                            component: User,
+                            name: 'User',
+                            meta: {
+                                title: 'user.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/userOrganization/:id',
+                            component: UserOrganization,
+                            name: 'UserOrganization',
+                            meta: {
+                                title: 'user.organization.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/organization',
+                            component: Organization,
+                            name: 'Organization',
+                            meta: {
+                                title: 'organization.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/userOrganizationRole/:id',
+                            component: OrganizationRole,
+                            name: 'OrganizationRole',
+                            meta: {
+                                title: 'organization.role.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/menu',
+                            component: Menu,
+                            name: 'Menu',
+                            meta: {
+                                title: 'menu.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/menuItem',
+                            component: MenuItem,
+                            name: 'MenuItem',
+                            meta: {
+                                title: 'menuItem.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/role',
+                            component: Role,
+                            name: 'Role',
+                            meta: {
+                                title: 'role.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/rolePermission/:id',
+                            component: RolePermission,
+                            name: 'RolePermission',
+                            meta: {
+                                title: 'rolePermission.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/securitySubject',
+                            component: SecuritySubject,
+                            name: 'SecuritySubject',
+                            meta: {
+                                title: 'securitySubject.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/securitySubjectPermission/:id',
+                            component: SecuritySubjectPermission,
+                            name: 'SecuritySubjectPermission',
+                            meta: {
+                                title: 'securitySubjectPermission.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/permissionType',
+                            component: PermissionType,
+                            name: 'PermissionType',
+                            meta: {
+                                title: 'permissionType.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+
+                    ]
+                }
             ]
         },
+
        /* {
             path: '*',
             component: PageNotFound
@@ -153,8 +205,16 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-   // document.title = i18n.t(to.meta.title)
-    return next();
+    if(to.matched.some(record => record.meta.requiresAuth)) {
+        debugger
+        if (!store.state.shared['auth-token']) {
+            next({
+                path: "/auth/login",
+                params: { nextUrl: to.fullPath }
+            })
+        }
+    }
+    next();
 });
 
 
