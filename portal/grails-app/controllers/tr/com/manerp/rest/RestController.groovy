@@ -118,7 +118,7 @@ class RestController extends BaseController{
             ex.printStackTrace()
         }
 
-        render maneResponse
+        render maneResponse as JSON
     }
 
     def updateUser() {
@@ -165,7 +165,7 @@ class RestController extends BaseController{
             ex.printStackTrace()
         }
 
-        render maneResponse
+        render maneResponse as JSON
     }
 
     def deleteUser() {
@@ -186,7 +186,7 @@ class RestController extends BaseController{
             ex.printStackTrace()
         }
 
-        render restDto
+        render restDto as JSON
     }
 
     def getAllRoleList(){
@@ -237,7 +237,7 @@ class RestController extends BaseController{
             ex.printStackTrace()
         }
 
-        render maneResponse
+        render restDto as JSON
     }
 
     def updateRole()
@@ -262,7 +262,7 @@ class RestController extends BaseController{
             restDto.message = ex.getMessage()
         }
 
-        render maneResponse
+        render restDto as JSON
     }
 
     def deleteRole()
@@ -282,7 +282,7 @@ class RestController extends BaseController{
             ex.printStackTrace()
         }
 
-        render maneResponse
+        render restDto as JSON
     }
 
 
@@ -311,7 +311,7 @@ class RestController extends BaseController{
         result.each { secSub ->
             RolePermissionDto rpDto = new RolePermissionDto()
             restService.getAllUnavailablePermissionTypes(rpDto,role.id,secSub.id.toString())
-            restService.getAllAvailablePermissionTypes(rpDto,secSub.id.toString())
+            restService.getAllAvailablePermissionTypes(rpDto,role.id,secSub.id.toString())
             rpDto.setName(secSub.name)
             resultList.add(rpDto)
         }
@@ -357,7 +357,7 @@ class RestController extends BaseController{
             ex.printStackTrace()
         }
 
-        render maneResponse
+        render restDto as JSON
     }
     def deleteRolePermission()
     {
@@ -381,7 +381,7 @@ class RestController extends BaseController{
             }
         }
 
-        render restDto
+        render restDto as JSON
     }
     def addUserOrganizationRole() {
 
@@ -402,7 +402,7 @@ class RestController extends BaseController{
             restDto.message = e.getMessage()
             restDto.status = 500
         }
-        render restDto
+        render restDto as JSON
 
     }
 }

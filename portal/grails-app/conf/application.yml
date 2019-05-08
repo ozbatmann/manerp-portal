@@ -104,9 +104,6 @@ grails:
 grails:
     cors:
         enabled: true
-        exposedHeaders:
-            - X-Authorization
-            - X-EKX-UCID
 endpoints:
     jmx:
         unique-names: true

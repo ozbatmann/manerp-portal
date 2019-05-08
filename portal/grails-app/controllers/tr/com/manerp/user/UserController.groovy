@@ -51,6 +51,27 @@ class UserController extends BaseController
 
         render maneResponse
     }
+    def show()
+    {
+        ManeResponse maneResponse = new ManeResponse()
+
+        try {
+            User user = userService.getUserDetail(params.id)
+            result.data = result.data.collect {
+                return [id: it.id, username: it.username, password: it.password, person: [id       : it.person?.id, name: it.person?.name, surname: it.person?.surname, tckn: it.person?.identificationNumber,
+                                                                                          birthDate: it.person?.birthDate == null ? null : sdf.format(it.person.birthDate), email: it.person?.email]]
+            }
+            maneResponse.data = result.toMap()
+
+        } catch (Exception ex) {
+
+            if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
+            maneResponse.message = ex.getMessage()
+            ex.printStackTrace()
+        }
+
+        render maneResponse
+    }
 
     def save()
     {

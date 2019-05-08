@@ -98,16 +98,31 @@ class RestService extends BaseService{
         List list = new ArrayList()
 
         int totalCount = 0;
-       UserOrganizationRole.createCriteria().list{
-            organization{
-                eq("id",organizationId)
+        UserOrganizationRole.createCriteria().list{
+            organization {
+                eq("id", organizationId)
             }
-        }.collect{it -> list.add([id: it.id, organization: [id: it.organization.id, name: it.organization.name], role:[id: it.role.id, name: it.role.name]]) }
+        }.collect{it ->
+            if(list.size() == 0){
+                list.add([id: it.id, organization: [id: it.organization.id, name: it.organization.name], role:[id: it.role.id, name: it.role.name]])
+            }
+            if(!checkThatExist(list,it)) {list.add([id: it.id, organization: [id: it.organization.id, name: it.organization.name], role:[id: it.role.id, name: it.role.name]])
+
+         }
+        }
 
         return list
     }
 
 
+    def checkThatExist(List list, item){
+        for(int i = 0; i < list.size(); i++){
+            if(list.get(i).role.id == item.role.id ) {
+                return true
+            }
+        }
+        return false
+    }
     List getAllRolePermissionList() {
 
       /*  List<SecuritySubject> securitySubjectList = SecuritySubject.list()
@@ -199,19 +214,18 @@ class RestService extends BaseService{
             }
         } as List
 
-        if(secSubPermList.size() > 0){
             List availablePermTypeList = SecuritySubjectPermission.createCriteria().list{
                 securitySubject{
                     eq("id",securitySubjectId)
                 }
 
-                not {
-                    'in'("id", secSubPermList)
+                if(secSubPermList.size() > 0 && secSubPermList != null) {
+                    not {
+                        'in'("id", secSubPermList)
+                    }
                 }
-
 
             }.collect{it2 -> rpDto.permissions.add([id:it2.id, name: it2.permissionType.name,status: false])} as List
         }
-    }
 }
 
