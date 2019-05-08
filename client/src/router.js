@@ -5,7 +5,6 @@ Vue.use(Router);
 
 import App from '@/App'
 import AppLayout from '@/modules/shared/components/AppLayout'
-/*import Home from '@/modules/core/pages/Home'*/
 import Login from '@/modules/auth/pages/MLogin'
 import User from '@/modules/user/pages/User'
 import Organization from '@/modules/organization/pages/Organization'
@@ -18,15 +17,9 @@ import RolePermission from '@/modules/role/pages/RolePermission'
 import SecuritySubject from '@/modules/securitySubject/pages/SecuritySubject'
 import SecuritySubjectPermission from '@/modules/securitySubject/pages/SecuritySubjectPermission'
 import PermissionType from '@/modules/permissionType/pages/PermissionType'
+import ActionItem from '@/modules/actionItem/pages/ActionItem'
+import ActionItemPermission from '@/modules/actionItem/pages/ActionItemPermission'
 
-/*
-import User from '@/modules/user/pages/User'
-import UserOrganization from '@/modules/user/pages/UserOrganization'
-import UserOrganizationRole from '@/modules/user/pages/UserOrganizationRole'
-
-import Role from '@/modules/role/pages/Role'
-import RolePermissionScreen from '@/modules/role/components/rolePermissionScreen/rolePermissionScreen'
-*/
 
 /*import PageNotFound from '@/modules/core/pages/PageNotFound'*/
 
@@ -191,6 +184,25 @@ const router = new Router({
                                 requiresAuth: true
                             }
                         },
+                        {
+                            path: '/actionItem',
+                            component: ActionItem,
+                            name: 'ActionItem',
+                            meta: {
+                                title: 'actionItem.title',
+                                noCache: true,
+                                requiresAuth: true
+                            }
+                        },
+                        {
+                            path: '/actionItemPermission/:id',
+                            component: ActionItemPermission,
+                            name: 'ActionItemPermission',
+                            meta: {
+                                title: 'actionItemPermission.title',
+                                noCache: true
+                            }
+                        },
 
                     ]
                 }
@@ -205,7 +217,7 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-    if(to.matched.some(record => record.meta.requiresAuth)) {
+    /*if(to.matched.some(record => record.meta.requiresAuth)) {
         debugger
         if (!store.state.shared['auth-token']) {
             next({
@@ -213,7 +225,7 @@ router.beforeEach((to, from, next) => {
                 params: { nextUrl: to.fullPath }
             })
         }
-    }
+    }*/
     next();
 });
 

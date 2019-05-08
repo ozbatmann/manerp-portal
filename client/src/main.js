@@ -9,7 +9,6 @@ import './pagination-models'
 //http.defaults.baseURL = "http://157.230.125.223:80";
 http.defaults.baseURL = "http://localhost:8091";
 
-debugger;
 if(store.state.shared['auth-token']){
   http.defaults.headers.common['Authorization'] = store.state.shared['auth-token']
 }

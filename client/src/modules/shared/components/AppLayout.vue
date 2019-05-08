@@ -188,6 +188,11 @@
                 icon: 'mdi-key',
                 to: { name: 'PermissionType'}
               },
+              {
+                title: 'Aksiyon Elemanı Yönetimi',
+                icon: 'mdi-key',
+                to: { name: 'ActionItem'}
+              },
             ]
           }
         ],

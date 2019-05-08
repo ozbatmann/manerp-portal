@@ -77,11 +77,11 @@
 
                 // An Object that holds
                 // username information of the user
-                username: 'bumerangadmin',
+                username: 'admin',
 
                 // An Object that holds
                 // password information of the user
-                password: '123456',
+                password: '.db9219f',
 
                 resetPassword: {
                     name: "auth.mail",
@@ -102,9 +102,12 @@
                 this.$http.post('/api/v1/auth/login', loginData)
                     .then(result => {
                         if(result.data.status === 200){
-                            console.log(this.$store);
+                            console.log(this.$store.state);
+                            debugger;
                             this.$store.state.shared['user'] = result.data.data.user
                             this.$store.state.shared['auth-token'] = result.data.data.token
+                            this.$http.defaults.headers.common['Authorization'] = this.$store.state.shared['auth-token']
+                            console.log(this.$store.state);
                             this.$router.push({name: "Overview"})
                         }
                         console.log(result)

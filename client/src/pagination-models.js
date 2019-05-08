@@ -65,6 +65,12 @@ let pgModels = {
        descending: '',
        page: 1
      },
+    actionItem: {
+       rowsPerPage: 10,
+       sortBy: '',
+       descending: '',
+       page: 1
+     },
  };
 
 import Vue from 'vue'
