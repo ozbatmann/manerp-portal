@@ -22,6 +22,7 @@ class UserController extends BaseController
 
     def userService
     def personService
+    def userOrganizationService
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd")
 
@@ -79,6 +80,16 @@ class UserController extends BaseController
             user.active = true
 
             userService.save(user)
+
+            if(requestParams.staffId){
+                Organization organization = Organization.findByName("Bumerang Lojistik")
+                UserOrganization userOrganization = new UserOrganization()
+                userOrganization.user = user
+                userOrganization.organization = organization
+
+              userOrganizationService.save(userOrganization)
+            }
+
             maneResponse.statusCode = StatusCode.CREATED
             maneResponse.data = user.id
             maneResponse.message = 'Kullanıcı başarıyla kaydedildi.'

@@ -154,9 +154,9 @@ class SecuritySubjectPermissionController extends BaseController {
         render maneResponse
     }
 
-    def getSecSubPermListDDS(){
+    def getSecSubPermListNotExistInActionsDDS(){
 
-        List<SecuritySubjectPermission> result = securitySubjectPermissionService.getSecSubPermListDDS()
+        List<SecuritySubjectPermission> result = securitySubjectPermissionService.getSecSubPermListNotExistInActionsDDS()
         result = result.collect {
             return [id: it.id, dependsOnMenuItem: it.dependsOnMenuItem, securitySubject: [id: it.securitySubject.id, name: it.securitySubject.name+"-"+it.permissionType.name],
                     permissionType: [id: it.permissionType.id, name: it.permissionType.name]]

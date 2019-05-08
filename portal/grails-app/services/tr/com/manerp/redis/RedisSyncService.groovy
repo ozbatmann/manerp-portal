@@ -4,10 +4,12 @@ import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 import redis.clients.jedis.Jedis
+import tr.com.manerp.auth.ActionItem
 import tr.com.manerp.auth.Role
 import tr.com.manerp.auth.SecuritySubjectPermission
 import tr.com.manerp.common.MenuItem
 import tr.com.manerp.common.Organization
+import tr.com.manerp.enumeration.ActionItemPermType
 import tr.com.manerp.enumeration.RedisSyncType
 import tr.com.manerp.user.UserOrganizationRole
 
@@ -38,18 +40,50 @@ class RedisSyncService {
 
         List<SecuritySubjectPermission> userOrgPermList = userAuthService.getUserOrgPermList(orgId, username)
 
+        List<ActionItem> actionItemList = userAuthService.getActionItemList( userAuthService.getUserOrgPermList( orgId, username))
+        synchronizeActionItemList(actionItemList, orgId, username)
+
         writeToRedis(userOrgPermList, key)
     }
 
     JSONArray synchronizeUserMenu(String orgId, String username, String key) {
 
         List<MenuItem> userMenuItemList = userAuthService.getUserMenuItemListForRedis(orgId, username)
+        //ActionItem izin kontrolu
+        List<ActionItem> actionItemList = userAuthService.getActionItemList(userAuthService.getUserOrgPermList(orgId, username))
+
+        synchronizeActionItemList(actionItemList,orgId, username)
 
         //Front'e verip menuBar için JSONArray donecek, ayni dongunun icinde redis'e yazacak.
         writeToRedis(userMenuItemList, key)
     }
+    void synchronizeActionItemList(List<ActionItem> actionItemList,String orgId, String username) {
 
-    //Front icin JSONArray donecek, ayni dongunun icinde redis'e yazacak.
+        String key = createActionItemRedisKey(orgId, username)
+        deleteKeyFromRedis(key, false)
+
+        synchronizeActionItem(actionItemList, key)
+    }
+
+    String createActionItemRedisKey(String orgId, String username) {
+
+        String key = orgId + ":" + username + ":" + RedisSyncType.ACTION_ITEM.toString()
+        log.info("*** ACTION ITEM CREATED KEY *** ::: " + key)
+        return key
+    }
+
+    void synchronizeActionItem(List<ActionItem> actionItemList, String key) {
+
+        List<String> redisValueList = new ArrayList<String>()
+
+        actionItemList.each { actionItem ->
+
+            redisValueList.add(actionItem.controllerName + ":" + actionItem.actionName)
+        }
+
+        writeToRedis(redisValueList, key)
+    }
+
     JSONArray writeToRedis(List<Object> redisDataList, String key) {
 
         JSONArray resultArr = new JSONArray()
@@ -61,34 +95,42 @@ class RedisSyncService {
                 String field
                 def value
 
-                field = redisData.id
+                if (redisData instanceof String) {
 
-                if (redisData instanceof SecuritySubjectPermission) {
-
-                    value = new JSONObject(permission: redisData.securitySubject.name + ":" + redisData.permissionType.name)
-                } else if (redisData instanceof MenuItem) {
-
-                    value = new JSONObject(id: redisData.id,
-                            name: redisData.name,
-                            orderNo: redisData.orderNo,
-                            url: redisData.url,
-                            type: redisData.type.toString(),
-                            icon: redisData.icon == null ? null : Base64.encodeAsBase64(redisData.icon),
-                            permission: redisData.securitySubjectPermission == null ? null : redisData.securitySubjectPermission.securitySubject.name + ":" + redisData.securitySubjectPermission.permissionType.name,
-                            parent: redisData.parent == null ? null : redisData.parent.id)
+                    field = redisData
+                    value = ActionItemPermType.AUTHORIZED
+                    jedis.hset(key, field, value.toString())
                 } else {
 
+                    field = redisData.id
 
-                    value = new JSONObject(id: redisData.id, name: redisData.name,
-                            logo: redisData.logo == null ? null : Base64.encodeAsBase64(redisData.logo))
+                    if (redisData instanceof SecuritySubjectPermission) {
+
+                        value = new JSONObject(permission: redisData.securitySubject.name + ":" + redisData.permissionType.name)
+                    } else if (redisData instanceof MenuItem) {
+
+                        value = new JSONObject(id: redisData.id,
+                                name: redisData.name,
+                                orderNo: redisData.orderNo,
+                                url: redisData.url,
+                                type: redisData.type.toString(),
+                                icon: redisData.icon == null ? null : Base64.encodeAsBase64(redisData.icon),
+                                permission: redisData.securitySubjectPermission == null ? null : redisData.securitySubjectPermission.securitySubject.name + ":" + redisData.securitySubjectPermission.permissionType.name,
+                                parent: redisData.parent == null ? null : redisData.parent.id)
+                    } else {
+
+
+                        value = new JSONObject(id: redisData.id, name: redisData.name,
+                                logo: redisData.logo == null ? null : Base64.encodeAsBase64(redisData.logo))
+                    }
+
+                    resultArr.add(value instanceof JSONObject ? value : new JSONObject(userOrg: value.toString()))
+
+                    jedis.hset(key, field, value.toString())
+                    log.info("writeToRedis   :    key= " + key + " value=" + value.toString())
                 }
 
-                resultArr.add(value instanceof JSONObject ? value : new JSONObject(userOrg: value.toString()))
-
-                jedis.hset(key, field, value.toString())
-                log.info("writeToRedis   :    key= " + key + " value=" + value.toString())
             }
-
         }
 
         resultArr
@@ -401,10 +443,39 @@ class RedisSyncService {
             }
         }
     }
+    void synchronizeActionItemListForAllUsers(String appId) {
 
-    String createOrganizationKeyPattern() {
+        ArrayList userOrgList = userAuthService.getUserOrgListByAppId(appId)
 
-        return "*:" + RedisSyncType.ORG.toString()
+        userOrgList.each { userOrgArr ->
+
+            String orgId = userOrgList.get(0)[0].id
+            String username = userOrgList.get(0)[1]
+
+            //ActionItem izin kontrolu
+            List<ActionItem> actionItemList = userAuthService.getActionItemListByAppId(appId, userAuthService.getUserOrgPermList( orgId, username))
+            synchronizeActionItemList(actionItemList,orgId, username)
+        }
+    }
+
+    void activateActionItemInRedis(ActionItem actionItem) {
+
+        redisService.withRedis { Jedis jedis ->
+
+            jedis.hset(generateActionItemKey(actionItem), "exist", "exist")
+        }
+    }
+
+    void deactivateActionItemInRedis(ActionItem actionItem) {
+
+        deleteKeyFromRedis(generateActionItemKey(actionItem), false)
+    }
+
+    String generateActionItemKey(ActionItem actionItem) {
+
+        String key = actionItem.controllerName + ":" + actionItem.actionName
+        log.info("*** ACTION ITEM GENERATED KEY *** ::: " + key)
+        return key
     }
 
 

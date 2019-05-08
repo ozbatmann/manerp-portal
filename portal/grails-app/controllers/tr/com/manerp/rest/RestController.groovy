@@ -14,6 +14,7 @@ import tr.com.manerp.auth.SaltGenerator
 import tr.com.manerp.auth.SecuritySubjectPermission
 import tr.com.manerp.base.controller.BaseController
 import tr.com.manerp.common.Organization
+import tr.com.manerp.dto.RestDto
 import tr.com.manerp.dto.RolePermissionDto
 import tr.com.manerp.user.Person
 import tr.com.manerp.user.User
@@ -35,32 +36,50 @@ class RestController extends BaseController{
 
     def getAllUserList(){
 
-        ManeResponse maneResponse = new ManeResponse()
+        RestDto restDto = new RestDto()
         try {
-            JSONArray result = restService.getAllUserList(
+            List result = restService.getAllUserList(
                     request.JSON.organizationId.toString(),request.JSON.roleId.toString())
 
-            if(result.size() > 0){
-                result.add(new JSONObject("totalCount":result.size()))
-                maneResponse.setData(result)
-            }
-            else{
-                result.add(new JSONObject(message: "Kullanıcı bulunamadı."))
-                maneResponse.setData(result)
-            }
+            restDto.itemList = result
+            restDto.itemCount = result.size()
+            restDto.status = 200
         }
 
         catch (Exception e) {
+            restDto.message = e.getMessage()
 
-            throw new Exception(e.getMessage())
         }
-        render maneResponse
+        render restDto as JSON
+
+    }
+    def getAllUserListBySearchParam(){
+
+        RestDto restDto = new RestDto()
+
+        ManeResponse maneResponse = new ManeResponse()
+        try {
+            List result = restService.getAllUserListBySearchParam(request.JSON.searchParam,request.JSON.roleId)
+
+            restDto.itemList = result
+            restDto.itemCount = result.size()
+            restDto.status = 200
+        }
+
+        catch (Exception e) {
+            maneResponse.setStatusCode(StatusCode.INTERNAL_ERROR)
+            maneResponse.setMessage(e.getMessage())
+        }
+        maneResponse.setData(status: false)
+        render restDto as JSON
 
     }
 
     def addUser(){
 
         def requestParams = request.JSON
+        RestDto restDto = new RestDto()
+
 
         ManeResponse maneResponse = new ManeResponse()
 
@@ -83,23 +102,19 @@ class RestController extends BaseController{
             user.salt = salt
             user.person = person
             user.active = true
-
             userService.save(user)
-            maneResponse.statusCode = StatusCode.CREATED
-            maneResponse.setData(new JSONObject(id: user.id,username: user.username))
-            maneResponse.message = 'Kullanıcı başarıyla kaydedildi.'
+            restDto.status = 200
+            restDto.message  "Kullanıcı başarıyla eklendi."
 
         } catch (ValidationException ex) {
 
-            maneResponse.statusCode = StatusCode.BAD_REQUEST
-            maneResponse.message = parseValidationErrors(ex.errors)
+            restDto.status = 500
+            restDto.message = ex.getMessage()
             ex.printStackTrace()
 
         } catch (Exception ex) {
-
-            maneResponse.statusCode = StatusCode.INTERNAL_ERROR
-            maneResponse.message = ex.getMessage()
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            restDto.status = 500
+            restDto.message = ex.getMessage()
             ex.printStackTrace()
         }
 
@@ -109,8 +124,8 @@ class RestController extends BaseController{
     def updateUser() {
 
         def requestParams = request.JSON
+        RestDto restDto = new RestDto()
 
-        ManeResponse maneResponse = new ManeResponse()
 
         try {
             Person person = Person.get(requestParams.person.id)
@@ -133,15 +148,13 @@ class RestController extends BaseController{
             user.person = person
 
             userService.save(user)
-            maneResponse.statusCode = StatusCode.CREATED
-            maneResponse.setData(new JSONObject(id: user.id, username: user.username))
-            maneResponse.message = 'Kullanıcı başarıyla güncellendi.'
+            restDto.statusCode = 200
+            restDto.message = 'Kullanıcı başarıyla güncellendi.'
 
         } catch (ValidationException ex) {
 
-            maneResponse.statusCode = StatusCode.BAD_REQUEST
-            maneResponse.message = parseValidationErrors(ex.errors)
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            restDto.statusCode = 500
+            restDto.message = ex.getMessage()
             ex.printStackTrace()
 
         } catch (Exception ex) {
@@ -157,51 +170,47 @@ class RestController extends BaseController{
 
     def deleteUser() {
 
-        ManeResponse maneResponse = new ManeResponse()
-        User user = User.get(request.JSON.id)
+        RestDto restDto = new RestDto()
+
 
         try {
-
-            userService.delete(user)
-            maneResponse.statusCode = StatusCode.NO_CONTENT
-            maneResponse.message = 'Kullanıcı başarıyla silindi.'
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            UserOrganizationRole userOrganizationRole = restService.getUserOrganizationRole(request.JSON.userId)
+            userOrganizationRoleService.delete(userOrganizationRole)
+            restDto.status = 200
+            restDto.message = 'Kullanıcı rolden çıkartıldı.'
         } catch (Exception ex) {
 
             if (!user) {
-                maneResponse.statusCode = StatusCode.BAD_REQUEST
-                maneResponse.message = 'Silinmek istenen kullanıcı sistemde bulunmamaktadır.'
-                maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+                restDto.status = 500
             }
-
-            if (maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
-            maneResponse.message = maneResponse.message ?: ex.getMessage()
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
             ex.printStackTrace()
         }
 
-        render maneResponse
+        render restDto
     }
 
     def getAllRoleList(){
 
-        ManeResponse maneResponse = new ManeResponse()
+        RestDto restDto = new RestDto()
         try {
-            JSONArray result = restService.getAllRoleList(request.JSON.organizationId)
-            result.add(new JSONObject("totalCount":result.size()))
-            maneResponse.setData(result)
+            List result = restService.getAllRoleList(request.JSON.organizationId)
+
+            restDto.itemList = result
+            restDto.itemCount = result.size()
+            restDto.status = 200
         }
 
         catch (Exception e) {
 
-            throw new Exception(e.getMessage())
+            restDto.message = e.getMessage()
+            restDto.status = 500
         }
-        render maneResponse
+        render restDto as JSON
     }
 
     def addRole()
     {
-        ManeResponse maneResponse = new ManeResponse()
+        RestDto restDto = new RestDto()
 
         try {
             Role role = new Role()
@@ -212,59 +221,45 @@ class RestController extends BaseController{
             userOrganizationRole.organization = Organization.findById(request.JSON.organizationId)
             userOrganizationRole.role = role
             userOrganizationRoleService.save(userOrganizationRole)
-            maneResponse.statusCode = StatusCode.CREATED
-            maneResponse.setData(new JSONObject(id: role.id, name: role.name))
-            maneResponse.message = 'Rol başarıyla kaydedildi.'
+            restDto.status = 200
+            restDto.message = 'Rol başarıyla kaydedildi.'
 
         } catch (ValidationException ex) {
 
-            maneResponse.statusCode = StatusCode.BAD_REQUEST
-            maneResponse.message = parseValidationErrors(ex.errors)
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            restDto.message = ex.getMessage()
+            restDto.status = 500
             ex.printStackTrace()
 
         } catch (Exception ex) {
 
-            maneResponse.statusCode = StatusCode.INTERNAL_ERROR
-            maneResponse.message = ex.getMessage()
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            restDto.message = ex.getMessage()
+            restDto.status = 500
             ex.printStackTrace()
         }
 
         render maneResponse
     }
 
-    def updateRole(Role role)
+    def updateRole()
     {
-        ManeResponse maneResponse = new ManeResponse()
+       RestDto restDto = new RestDto()
 
         try {
-
+            Role role = Role.findById(request.JSON.roleId)
+            role.name = request.JSON.name
             roleService.save(role)
-            maneResponse.statusCode = StatusCode.NO_CONTENT
-            maneResponse.setData(new JSONObject(id: role.id, name:role.name))
-            maneResponse.message = 'Rol başarıyla güncellendi.'
+            restDto.status = 200
+            restDto.message = 'Rol başarıyla güncellendi.'
 
         } catch (ValidationException ex) {
 
-            maneResponse.statusCode = StatusCode.BAD_REQUEST
-            maneResponse.message = parseValidationErrors(ex.errors)
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            restDto.status = 500
+            restDto.message = ex.getMessage()
             ex.printStackTrace()
 
         } catch (Exception ex) {
-
-            if ( !role ) {
-                maneResponse.statusCode = StatusCode.BAD_REQUEST
-                maneResponse.message = 'Güncellenmek istenen rol sistemde bulunmamaktadır.'
-                maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
-
-            }
-
-            if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
-            maneResponse.message = maneResponse.message ?: ex.getMessage()
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
-            ex.printStackTrace()
+            restDto.status = 500
+            restDto.message = ex.getMessage()
         }
 
         render maneResponse
@@ -272,28 +267,18 @@ class RestController extends BaseController{
 
     def deleteRole()
     {
-        ManeResponse maneResponse = new ManeResponse()
-        Role role = Role.get(request.JSON.id)
+        RestDto restDto = new RestDto()
 
         try {
-
+            Role role = Role.get(request.JSON.roleId)
             roleService.delete(role)
-            maneResponse.statusCode = StatusCode.NO_CONTENT
-            maneResponse.message = 'Rol başarıyla silindi.'
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            restDto.status = 200
+            restDto.message = 'Rol başarıyla silindi.'
 
 
         } catch (Exception ex) {
-
-            if ( !role ) {
-                maneResponse.statusCode = StatusCode.BAD_REQUEST
-                maneResponse.message = 'Silinmek istenen rol sistemde bulunmamaktadır.'
-                maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
-            }
-
-            if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
-            maneResponse.message = maneResponse.message ?: ex.getMessage()
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            restDto.status = 500
+            restDto.message = ex.getMessage()
             ex.printStackTrace()
         }
 
@@ -326,16 +311,16 @@ class RestController extends BaseController{
         result.each { secSub ->
             RolePermissionDto rpDto = new RolePermissionDto()
             restService.getAllUnavailablePermissionTypes(rpDto,role.id,secSub.id.toString())
-
-            restService.getAllAvailablePermissionTypes(rpDto,role.id,secSub.id.toString())
+            restService.getAllAvailablePermissionTypes(rpDto,secSub.id.toString())
             rpDto.setName(secSub.name)
             resultList.add(rpDto)
         }
 
 
 
+
+
         JSONArray jsonArray = (JSONArray) resultList
-        jsonArray.add(new JSONObject("totalCount":resultList.size()))
 
         maneResponse.setData(jsonArray)
 
@@ -346,7 +331,8 @@ class RestController extends BaseController{
     def addRolePermission()
     {
 
-        ManeResponse maneResponse = new ManeResponse()
+        RestDto restDto = new RestDto()
+
 
         try {
             RolePermission rolePermission = new RolePermission()
@@ -356,22 +342,18 @@ class RestController extends BaseController{
             rolePermission.role = role
             rolePermission.active = true
             rolePermissionService.save(rolePermission)
-            maneResponse.statusCode = StatusCode.CREATED
-            maneResponse.setData(new JSONObject(id: rolePermission.id))
-            maneResponse.message = 'Rol izni başarıyla kaydedildi.'
+            restDto.status = 200
+            restDto.message = 'Rol izni başarıyla kaydedildi.'
 
         } catch (ValidationException ex) {
 
-            maneResponse.statusCode = StatusCode.BAD_REQUEST
-            maneResponse.message = parseValidationErrors(ex.errors)
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
-            ex.printStackTrace()
+            restDto.status = 500
+            restDto.message = ex.getMessage()
 
         } catch (Exception ex) {
 
-            maneResponse.statusCode = StatusCode.INTERNAL_ERROR
-            maneResponse.message = ex.getMessage()
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            restDto.status = 500
+            restDto.message = ex.getMessage()
             ex.printStackTrace()
         }
 
@@ -379,7 +361,8 @@ class RestController extends BaseController{
     }
     def deleteRolePermission()
     {
-        ManeResponse maneResponse = new ManeResponse()
+        RestDto restDto = new RestDto()
+
         SecuritySubjectPermission securitySubjectPermission = SecuritySubjectPermission.findById(request.JSON.id)
 
         RolePermission rolePermission = RolePermission.findBySecuritySubjectPermission(securitySubjectPermission)
@@ -387,40 +370,39 @@ class RestController extends BaseController{
         try {
 
             rolePermissionService.delete(rolePermission)
-            maneResponse.statusCode = StatusCode.NO_CONTENT
-            maneResponse.message = 'Rol izni başarıyla silindi.'
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
+            restDto.status = 200
+            restDto.message = 'Rol izni başarıyla silindi.'
 
         } catch (Exception ex) {
 
             if ( !rolePermission ) {
-                maneResponse.statusCode = StatusCode.BAD_REQUEST
-                maneResponse.message = 'Silinmek istenen rol izni sistemde bulunmamaktadır.'
-                maneResponse.setData(true)
+                restDto.status = 500
+                restDto.message = 'Silinmek istenen rol izni sistemde bulunmamaktadır.'
             }
-
-            if ( maneResponse.statusCode.code <= StatusCode.NO_CONTENT.code ) maneResponse.statusCode = StatusCode.INTERNAL_ERROR
-            maneResponse.message = maneResponse.message ?: ex.getMessage()
-            maneResponse.setData(new JSONObject(status: maneResponse.statusCode, message: maneResponse.message))
-            ex.printStackTrace()
         }
 
-        render maneResponse
+        render restDto
     }
-    def getAllSecuritySubjectPermissionList() {
+    def addUserOrganizationRole() {
 
-        ManeResponse maneResponse = new ManeResponse()
+        RestDto restDto = new RestDto()
         try {
-            JSONArray result = restService.getAllSecuritySubjectPermissionList()
 
-            maneResponse.setData(result)
+            UserOrganizationRole userOrganizationRole = new UserOrganizationRole()
+
+            userOrganizationRole.user = User.findById(request.JSON.userId)
+            userOrganizationRole.role = Role.findById(request.JSON.roleId)
+            userOrganizationRole.organization = Organization.findById(request.JSON.organizationId)
+            userOrganizationRoleService.save(userOrganizationRole)
+            restDto.status = 200
+            restDto.message = 'Kullanıcı role başarıyla kaydedildi.'
         }
 
         catch (Exception e) {
-
-            throw new Exception(e.getMessage())
+            restDto.message = e.getMessage()
+            restDto.status = 500
         }
-        render maneResponse
+        render restDto
 
     }
 }

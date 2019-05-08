@@ -10,7 +10,7 @@ buildscript {
     }
 }
 
-version "0.1"
+version "1.0.1"
 group "portal"
 
 apply plugin: "eclipse"
@@ -65,7 +65,7 @@ dependencies {
     // manerp response plugin
     compile "tr.com.manerp:manerp-response-plugin:0.3.6"
     // manerp auth plugin
-    compile "tr.com.manerp:manerp-auth-plugin:0.7.9"
+    compile "tr.com.manerp:manerp-auth-plugin:1.0.2"
 
     compile "org.grails:grails-datastore-rest-client"
 

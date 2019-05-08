@@ -16,6 +16,11 @@ manerp {
             url = 'http://localhost:8091'
         }
     }
+    auth{
+        filter{
+            enabled = false
+        }
+    }
 }
 
 
@@ -27,6 +32,7 @@ environments {
         dataSource {
             dbCreate = 'update'
             url = System.getenv('POSTGRESQL_URL') ?: 'jdbc:postgresql://157.230.125.223:5432/manerp'
+            //url = System.getenv('POSTGRESQL_URL') ?: 'jdbc:postgresql://192.168.1.40:5432/manerp'
         }
         grails {
             redis {

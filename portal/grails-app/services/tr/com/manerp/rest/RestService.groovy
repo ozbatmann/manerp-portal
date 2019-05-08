@@ -8,16 +8,21 @@ import tr.com.manerp.auth.RolePermission
 import tr.com.manerp.auth.SecuritySubject
 import tr.com.manerp.auth.SecuritySubjectPermission
 import tr.com.manerp.base.service.BaseService
+import tr.com.manerp.common.Organization
 import tr.com.manerp.dto.RolePermissionDto
+import tr.com.manerp.user.User
+import tr.com.manerp.user.UserOrganization
 import tr.com.manerp.user.UserOrganizationRole
+
+import java.lang.reflect.Array
 
 @Transactional
 class RestService extends BaseService{
 
 
-    JSONArray getAllUserList(String organizationId,String roleId){
+    List getAllUserList(String organizationId,String roleId){
 
-        JSONArray jsonArray = new JSONArray(new JSONObject())
+        List list = new ArrayList()
 
        List<UserOrganizationRole> userOrganizationRoleList = UserOrganizationRole.createCriteria().list{
             organization{
@@ -26,31 +31,80 @@ class RestService extends BaseService{
             role{
                 eq("id",roleId)
             }
+           isNotNull("user")
+        } as List
+
+          userOrganizationRoleList.collect {
+                  User user = it.user
+                  list.add([id: it.id, username: user.username, name: user.person.name, surname: user.person.surname, birthDate: user.person.birthDate, email: user.person.email])
+          }
+        return list
+    }
+
+    List getAllUserListBySearchParam(String searchParam,String roleId){
+
+        List list = new ArrayList()
+
+        List<String> alreadyAddedUsers = UserOrganizationRole.createCriteria().list {
+
+            role{
+                eq("id",roleId)
+            }
+            user{
+                projections{
+
+                    property("id")
+                }
+            }
+
+
+        } as List
+
+       List<User> userList = UserOrganization.createCriteria().list{
+            user {
+                person {
+                    or{
+                        ilike("name", '%' + searchParam + '%')
+                        ilike("surname",'%' +searchParam + '%')
+                    }
+                }
+                if(alreadyAddedUsers.size() > 0 && alreadyAddedUsers != null) {
+                    not {
+                        'in'("id", alreadyAddedUsers)
+                    }
+                }
+            }
             projections{
                 property("user")
             }
         } as List
+            userList.collect{
+                if(it != null) {
+                    list.add([id: it.id, username: it.username, name: it.person.name, surname: it.person.surname, fullname: it.person.name + " " + it.person.surname, birthDate: it.person.birthDate, email: it.person.email])
+                }
+            }
 
-        if(userOrganizationRoleList.get(0) != null){
-          userOrganizationRoleList.collect{
-              jsonArray.add(new JSONObject(id: it.id, username: it.username, name: it.person.name, surname: it.person.surname, birthDate: it.person.birthDate, email: it.person.email))}
-
-        }
-        return jsonArray
+        return list
     }
 
+    def getUserOrganizationRole(String userOrgRoleId){
 
-    JSONArray getAllRoleList(String organizationId){
+        UserOrganizationRole userOrganizationRole = UserOrganizationRole.findById(userOrgRoleId)
+        return userOrganizationRole
+    }
 
-        JSONArray jsonArray = new JSONArray()
+    List getAllRoleList(String organizationId){
 
-        UserOrganizationRole.createCriteria().list{
+        List list = new ArrayList()
+
+        int totalCount = 0;
+       UserOrganizationRole.createCriteria().list{
             organization{
                 eq("id",organizationId)
             }
-        }.collect{it -> jsonArray.add(new JSONObject(id: it.id, organization: [id: it.organization.id, name: it.organization.name], role:[id: it.role.id, name: it.role.name]))}
+        }.collect{it -> list.add([id: it.id, organization: [id: it.organization.id, name: it.organization.name], role:[id: it.role.id, name: it.role.name]]) }
 
-        return jsonArray
+        return list
     }
 
 
@@ -118,14 +172,14 @@ class RestService extends BaseService{
         } as List<String>
 
         if(secSubPermList.size() > 0){
-        SecuritySubjectPermission.createCriteria().list{
-            securitySubject{
-                eq("id",securitySubjectId)
-            }
+            SecuritySubjectPermission.createCriteria().list{
+                securitySubject{
+                    eq("id",securitySubjectId)
+                }
 
                 'in'("id", secSubPermList)
 
-        }.collect{it2 -> rpDto.permissions.add([id:it2.id, name: it2.permissionType.name,status: true])} as List
+            }.collect{it2 -> rpDto.permissions.add([id:it2.id, name: it2.permissionType.name,status: true])} as List
         }
     }
 
@@ -146,53 +200,18 @@ class RestService extends BaseService{
         } as List
 
         if(secSubPermList.size() > 0){
-        List availablePermTypeList = SecuritySubjectPermission.createCriteria().list{
-            securitySubject{
-                eq("id",securitySubjectId)
-            }
+            List availablePermTypeList = SecuritySubjectPermission.createCriteria().list{
+                securitySubject{
+                    eq("id",securitySubjectId)
+                }
 
                 not {
                     'in'("id", secSubPermList)
                 }
 
 
-        }.collect{it2 -> rpDto.permissions.add([id:it2.id, name: it2.permissionType.name,status: false])} as List
+            }.collect{it2 -> rpDto.permissions.add([id:it2.id, name: it2.permissionType.name,status: false])} as List
         }
     }
-
-    JSONArray getAllSecuritySubjectPermissionList() {
-
-        List<SecuritySubject> securitySubjectList = SecuritySubject.list()
-
-        JSONArray jsonArray = new JSONArray()
-
-        List resultList = new ArrayList()
-
-
-        securitySubjectList.each { it ->
-            String name = it.name
-            List permissionTypeList = new ArrayList<>()
-             permissionTypeList = SecuritySubjectPermission.createCriteria().list { it2 ->
-
-                securitySubject {
-
-                    eq("name", name)
-
-                }
-                    projections{
-                        property("id")
-                        permissionType{
-                            property("name")
-                        }
-                    }
-
-                 } as List
-            JSONObject jsonObject = new JSONObject("securitySubject":name, "permissions":permissionTypeList)
-            jsonArray.add(new JSONObject(jsonObject))
-
-            } as List
-
-
-        return jsonArray
-    }
 }
+

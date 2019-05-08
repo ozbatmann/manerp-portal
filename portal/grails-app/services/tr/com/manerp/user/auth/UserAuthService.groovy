@@ -2,6 +2,7 @@ package tr.com.manerp.user.auth
 
 import grails.gorm.transactions.Transactional
 import org.hibernate.criterion.Order
+import tr.com.manerp.auth.ActionItem
 import tr.com.manerp.auth.Role
 import tr.com.manerp.auth.RolePermission
 import tr.com.manerp.auth.SecuritySubjectPermission
@@ -197,6 +198,20 @@ class UserAuthService {
         } as List<MenuItem>
     }
 
+    List<ActionItem> getActionItemList(List<SecuritySubjectPermission> securitySubjectPermissionList) {
+
+        ActionItem.createCriteria().list {
+
+            if(securitySubjectPermissionList != null && securitySubjectPermissionList.size() > 0) {
+                actionItemPermissionList {
+
+                    'in'('securitySubjectPermission', securitySubjectPermissionList)
+                }
+            }
+
+        } as List<ActionItem>
+    }
+
     /*
         Kullanicinin secili olan organizasyonu disinda hangi organizasyonlara yetkisi var ise o organizasyonlari listele.
      */
@@ -303,6 +318,7 @@ class UserAuthService {
 
             eq("role", role)
 
+            isNotNull("user")
             projections {
 
                 groupProperty('user')

@@ -42,11 +42,28 @@ class SecuritySubjectPermissionService {
         securitySubjectPermission.delete(flush: true, failOnError: true)
     }
 
-    def getSecSubPermListDDS(){
+    def getSecSubPermListNotExistInActionsDDS(){
+
+        List<String> secSubPermList = ActionItemPermission.createCriteria().list {
+
+            securitySubjectPermission{
+                projections{
+                    property("id")
+                }
+            }
+
+        } as List
 
         List<SecuritySubjectPermission> list = SecuritySubjectPermission.createCriteria().list {
            eq("active",true)
+
+            if(secSubPermList.size() > 0 && secSubPermList != null){
+                not{
+                    'in'('id', secSubPermList)
+                }
+            }
         } as List<SecuritySubjectPermission>
+
         return list
     }
 

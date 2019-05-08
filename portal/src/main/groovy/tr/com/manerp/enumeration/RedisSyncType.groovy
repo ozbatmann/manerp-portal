@@ -4,6 +4,7 @@ enum RedisSyncType {
 
     PERMISSION('PERMISSION'),
     MENU('MENU'),
+    ACTION_ITEM('ACTION_ITEM')
 
     final String value
 
